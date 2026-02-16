@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LayoutDashboard, FolderKanban, CheckSquare, Users, Calendar, BarChart3, Settings, Plus, Search, X, Trash2, Check, Circle, Clock, AlertCircle, ChevronDown, ArrowLeft, MessageSquare, Paperclip, MoreHorizontal } from "lucide-react";
+import { LayoutDashboard, FolderKanban, CheckSquare, Users, Calendar, BarChart3, Settings, Plus, Search, X, Check, Circle, Clock, AlertCircle, ArrowLeft, MessageSquare, Paperclip, MoreHorizontal } from "lucide-react";
 
 const P = { 50: "#f0fdfa", 100: "#ccfbf1", 200: "#99f6e4", 300: "#5eead4", 400: "#2dd4bf", 500: "#14b8a6", 600: "#0d9488", 700: "#0f766e", 800: "#115e59", 900: "#134e4a" };
 
@@ -123,9 +123,6 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
     assignee: members[0] ?? "",
     due: "2026-04-01"
   });
-  const [notification, setNotification] = useState<string | null>(null);
-
-  const showNotif = (msg: string) => { setNotification(msg); setTimeout(() => setNotification(null), 2500); };
 
   const filtered = projects.filter(p => {
     const ms = filterStatus === "すべて" || p.status === filterStatus;
@@ -161,8 +158,8 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
           <input type="text" placeholder="プロジェクトを検索..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
             style={{ padding: "8px 14px 8px 36px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, width: 260, outline: "none", background: "#f8fafc" }} />
         </div>
-        {["すべて", ...statuses].map(s => (
-          <button key={s} onClick={() => setFilterStatus(s)} style={{
+        {(["すべて", ...statuses] as const).map(s => (
+          <button key={s} onClick={() => setFilterStatus(s as Status | "すべて")} style={{
             padding: "6px 14px", borderRadius: 6, border: "1px solid", fontSize: 12, fontWeight: 500, cursor: "pointer",
             background: filterStatus === s ? P[500] : "#fff", color: filterStatus === s ? "#fff" : "#64748b", borderColor: filterStatus === s ? P[500] : "#e2e8f0",
           }}>{s}</button>
@@ -244,13 +241,13 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>ステータス</label>
-                  <select value={newProject.status} onChange={e => setNewProject({ ...newProject, status: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
+                  <select value={newProject.status} onChange={e => setNewProject({ ...newProject, status: e.target.value as Status })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>優先度</label>
-                  <select value={newProject.priority} onChange={e => setNewProject({ ...newProject, priority: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
+                  <select value={newProject.priority} onChange={e => setNewProject({ ...newProject, priority: e.target.value as Priority })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
                     {priorities.map(pr => <option key={pr} value={pr}>{pr}</option>)}
                   </select>
                 </div>
@@ -273,12 +270,6 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
               </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {notification && (
-        <div style={{ position: "fixed", bottom: 24, right: 24, background: "#0f172a", color: "#fff", padding: "12px 20px", borderRadius: 10, fontSize: 13, fontWeight: 500, boxShadow: "0 8px 24px rgba(0,0,0,0.15)", zIndex: 100, display: "flex", alignItems: "center", gap: 8 }}>
-          <Check size={15} style={{ color: P[400] }} /> {notification}
         </div>
       )}
     </>
@@ -382,7 +373,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
                     </div>
                   </td>
                   <td style={{ padding: "14px 16px" }}>
-                    <select value={t.status} onChange={e => onUpdateTask(project.id, t.id, e.target.value)}
+                    <select value={t.status} onChange={e => onUpdateTask(project.id, t.id, e.target.value as Status)}
                       style={{ padding: "4px 8px", border: "1px solid #e2e8f0", borderRadius: 6, fontSize: 12, background: statusColors[t.status].bg, color: statusColors[t.status].text, cursor: "pointer", outline: "none", fontWeight: 500 }}>
                       {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
