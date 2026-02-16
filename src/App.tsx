@@ -147,7 +147,7 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
           <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#0f172a" }}>プロジェクト一覧</h1>
           <p style={{ margin: "4px 0 0", fontSize: 13, color: "#64748b" }}>全 {counts.all} 件 ・ 進行中 {counts.active} 件 ・ レビュー {counts.review} 件 ・ 完了 {counts.done} 件</p>
         </div>
-        <button onClick={() => setShowAddModal(true)} style={{ padding: "9px 18px", background: `linear-gradient(135deg, ${P[500]}, ${P[400]})`, color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: `0 2px 8px ${P[500]}50` }}>
+        <button data-testid="add-project-button" onClick={() => setShowAddModal(true)} style={{ padding: "9px 18px", background: `linear-gradient(135deg, ${P[500]}, ${P[400]})`, color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: `0 2px 8px ${P[500]}50` }}>
           <Plus size={16} /> 新規プロジェクト
         </button>
       </div>
@@ -155,11 +155,11 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
       <div style={{ padding: "12px 28px", background: "#fff", borderBottom: "1px solid #e2e8f0", display: "flex", gap: 10, alignItems: "center" }}>
         <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
           <Search size={15} style={{ position: "absolute", left: 12, color: "#94a3b8" }} />
-          <input type="text" placeholder="プロジェクトを検索..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
+          <input data-testid="search-input" type="text" placeholder="プロジェクトを検索..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
             style={{ padding: "8px 14px 8px 36px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, width: 260, outline: "none", background: "#f8fafc" }} />
         </div>
         {(["すべて", ...statuses] as const).map(s => (
-          <button key={s} onClick={() => setFilterStatus(s as Status | "すべて")} style={{
+          <button key={s} data-testid={`filter-${s}`} onClick={() => setFilterStatus(s as Status | "すべて")} style={{
             padding: "6px 14px", borderRadius: 6, border: "1px solid", fontSize: 12, fontWeight: 500, cursor: "pointer",
             background: filterStatus === s ? P[500] : "#fff", color: filterStatus === s ? "#fff" : "#64748b", borderColor: filterStatus === s ? P[500] : "#e2e8f0",
           }}>{s}</button>
@@ -178,12 +178,12 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
             </thead>
             <tbody>
               {filtered.map(p => (
-                <tr key={p.id} style={{ borderBottom: "1px solid #f1f5f9", cursor: "pointer", transition: "background 0.1s" }}
+                <tr key={p.id} data-testid={`project-row-${p.id}`} style={{ borderBottom: "1px solid #f1f5f9", cursor: "pointer", transition: "background 0.1s" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#fafbfc"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
                   <td style={{ padding: "14px 16px", fontWeight: 600, fontSize: 13 }} onClick={() => onSelectProject(p.id)}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, color: P[700], cursor: "pointer" }}>
+                    <div data-testid={`project-name-${p.id}`} style={{ display: "flex", alignItems: "center", gap: 8, color: P[700], cursor: "pointer" }}>
                       <FolderKanban size={15} style={{ color: "#94a3b8", flexShrink: 0 }} />
                       <span style={{ borderBottom: "1px solid transparent", transition: "border-color 0.15s" }}
                         onMouseEnter={e => e.currentTarget.style.borderColor = P[700]}
@@ -227,27 +227,27 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
       </div>
 
       {showAddModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, backdropFilter: "blur(4px)" }}>
+        <div data-testid="add-project-modal" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, backdropFilter: "blur(4px)" }}>
           <div style={{ background: "#fff", borderRadius: 16, padding: 28, width: 440, boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}><Plus size={20} style={{ color: P[500] }} /> 新規プロジェクト</h2>
-              <button onClick={() => setShowAddModal(false)} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", display: "flex" }}><X size={20} /></button>
+              <button data-testid="modal-close-button" onClick={() => setShowAddModal(false)} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", display: "flex" }}><X size={20} /></button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
                 <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>プロジェクト名</label>
-                <input type="text" value={newProject.name} onChange={e => setNewProject({ ...newProject, name: e.target.value })} placeholder="プロジェクト名を入力" style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box", background: "#f8fafc" }} />
+                <input data-testid="project-name-input" type="text" value={newProject.name} onChange={e => setNewProject({ ...newProject, name: e.target.value })} placeholder="プロジェクト名を入力" style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 14, outline: "none", boxSizing: "border-box", background: "#f8fafc" }} />
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>ステータス</label>
-                  <select value={newProject.status} onChange={e => setNewProject({ ...newProject, status: e.target.value as Status })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
+                  <select data-testid="project-status-select" value={newProject.status} onChange={e => setNewProject({ ...newProject, status: e.target.value as Status })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
                     {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>優先度</label>
-                  <select value={newProject.priority} onChange={e => setNewProject({ ...newProject, priority: e.target.value as Priority })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
+                  <select data-testid="project-priority-select" value={newProject.priority} onChange={e => setNewProject({ ...newProject, priority: e.target.value as Priority })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
                     {priorities.map(pr => <option key={pr} value={pr}>{pr}</option>)}
                   </select>
                 </div>
@@ -255,18 +255,18 @@ function ProjectListPage({ projects, onSelectProject, onAddAndNavigate }: Projec
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>担当者</label>
-                  <select value={newProject.assignee} onChange={e => setNewProject({ ...newProject, assignee: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
+                  <select data-testid="project-assignee-select" value={newProject.assignee} onChange={e => setNewProject({ ...newProject, assignee: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}>
                     {members.map(m => <option key={m} value={m}>{m}</option>)}
                   </select>
                 </div>
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>期限</label>
-                  <input type="date" value={newProject.due} onChange={e => setNewProject({ ...newProject, due: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", outline: "none", boxSizing: "border-box" }} />
+                  <input data-testid="project-due-input" type="date" value={newProject.due} onChange={e => setNewProject({ ...newProject, due: e.target.value })} style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", outline: "none", boxSizing: "border-box" }} />
                 </div>
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8, justifyContent: "flex-end" }}>
-                <button onClick={() => setShowAddModal(false)} style={{ padding: "10px 20px", background: "#f8fafc", color: "#64748b", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>キャンセル</button>
-                <button onClick={handleAdd} style={{ padding: "10px 20px", background: `linear-gradient(135deg, ${P[500]}, ${P[400]})`, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: `0 2px 8px ${P[500]}50`, display: "flex", alignItems: "center", gap: 6 }}><Check size={15} /> 作成する</button>
+                <button data-testid="cancel-button" onClick={() => setShowAddModal(false)} style={{ padding: "10px 20px", background: "#f8fafc", color: "#64748b", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}>キャンセル</button>
+                <button data-testid="submit-project-button" onClick={handleAdd} style={{ padding: "10px 20px", background: `linear-gradient(135deg, ${P[500]}, ${P[400]})`, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: `0 2px 8px ${P[500]}50`, display: "flex", alignItems: "center", gap: 6 }}><Check size={15} /> 作成する</button>
               </div>
             </div>
           </div>
@@ -311,7 +311,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
     <>
       <div style={{ padding: "16px 28px", background: "#fff", borderBottom: "1px solid #e2e8f0" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-          <button onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: P[600], fontSize: 13, fontWeight: 500, padding: "4px 0" }}>
+          <button data-testid="back-button" onClick={onBack} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, color: P[600], fontSize: 13, fontWeight: 500, padding: "4px 0" }}>
             <ArrowLeft size={16} /> プロジェクト一覧
           </button>
         </div>
@@ -346,7 +346,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
       <div style={{ flex: 1, overflow: "auto", padding: "20px 28px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <h2 style={{ margin: 0, fontSize: 16, fontWeight: 700 }}>タスク一覧</h2>
-          <button onClick={() => setShowAddTaskModal(true)} style={{ padding: "8px 16px", background: `linear-gradient(135deg, ${P[500]}, ${P[400]})`, color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: `0 2px 8px ${P[500]}50` }}>
+          <button data-testid="add-task-button" onClick={() => setShowAddTaskModal(true)} style={{ padding: "8px 16px", background: `linear-gradient(135deg, ${P[500]}, ${P[400]})`, color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: `0 2px 8px ${P[500]}50` }}>
             <Plus size={16} /> 新規タスク
           </button>
         </div>
@@ -362,7 +362,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
             </thead>
             <tbody>
               {project.tasks.map(t => (
-                <tr key={t.id} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.1s" }}
+                <tr key={t.id} data-testid={`task-row-${t.id}`} style={{ borderBottom: "1px solid #f1f5f9", transition: "background 0.1s" }}
                   onMouseEnter={e => e.currentTarget.style.background = "#fafbfc"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
@@ -373,7 +373,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
                     </div>
                   </td>
                   <td style={{ padding: "14px 16px" }}>
-                    <select value={t.status} onChange={e => onUpdateTask(project.id, t.id, e.target.value as Status)}
+                    <select data-testid={`task-status-${t.id}`} value={t.status} onChange={e => onUpdateTask(project.id, t.id, e.target.value as Status)}
                       style={{ padding: "4px 8px", border: "1px solid #e2e8f0", borderRadius: 6, fontSize: 12, background: statusColors[t.status].bg, color: statusColors[t.status].text, cursor: "pointer", outline: "none", fontWeight: 500 }}>
                       {statuses.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
@@ -438,13 +438,13 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
       </div>
 
       {showAddTaskModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, backdropFilter: "blur(4px)" }}>
+        <div data-testid="add-task-modal" style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, backdropFilter: "blur(4px)" }}>
           <div style={{ background: "#fff", borderRadius: 16, padding: 28, width: 440, boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, display: "flex", alignItems: "center", gap: 8 }}>
                 <Plus size={20} style={{ color: P[500] }} /> 新規タスク
               </h2>
-              <button onClick={() => setShowAddTaskModal(false)} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", display: "flex" }}>
+              <button data-testid="task-modal-close-button" onClick={() => setShowAddTaskModal(false)} style={{ background: "none", border: "none", color: "#94a3b8", cursor: "pointer", display: "flex" }}>
                 <X size={20} />
               </button>
             </div>
@@ -452,6 +452,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
               <div>
                 <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>タスク名</label>
                 <input
+                  data-testid="task-title-input"
                   type="text"
                   value={newTask.title}
                   onChange={e => setNewTask({ ...newTask, title: e.target.value })}
@@ -463,6 +464,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>ステータス</label>
                   <select
+                    data-testid="task-status-select"
                     value={newTask.status}
                     onChange={e => setNewTask({ ...newTask, status: e.target.value as Status })}
                     style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}
@@ -473,6 +475,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
                 <div>
                   <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>担当者</label>
                   <select
+                    data-testid="task-assignee-select"
                     value={newTask.assignee}
                     onChange={e => setNewTask({ ...newTask, assignee: e.target.value })}
                     style={{ width: "100%", padding: "10px 14px", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, background: "#f8fafc", cursor: "pointer", outline: "none" }}
@@ -484,6 +487,7 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
               <div>
                 <label style={{ fontSize: 12, fontWeight: 600, color: "#64748b", display: "block", marginBottom: 6 }}>期限</label>
                 <input
+                  data-testid="task-due-input"
                   type="date"
                   value={newTask.due}
                   onChange={e => setNewTask({ ...newTask, due: e.target.value })}
@@ -492,12 +496,14 @@ function ProjectDetailPage({ project, onBack, onUpdateTask, onAddTask }: Project
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8, justifyContent: "flex-end" }}>
                 <button
+                  data-testid="task-cancel-button"
                   onClick={() => setShowAddTaskModal(false)}
                   style={{ padding: "10px 20px", background: "#f8fafc", color: "#64748b", border: "1px solid #e2e8f0", borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: "pointer" }}
                 >
                   キャンセル
                 </button>
                 <button
+                  data-testid="submit-task-button"
                   onClick={handleAddTask}
                   style={{ padding: "10px 20px", background: `linear-gradient(135deg, ${P[500]}, ${P[400]})`, color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: "pointer", boxShadow: `0 2px 8px ${P[500]}50`, display: "flex", alignItems: "center", gap: 6 }}
                 >
@@ -564,7 +570,7 @@ export default function App() {
           {navItems.map(item => {
             const Icon = item.icon;
             return (
-              <div key={item.label} onClick={() => { setActiveNav(item.label); if (item.label === "プロジェクト") handleBack(); }}
+              <div key={item.label} data-testid={`nav-${item.label}`} onClick={() => { setActiveNav(item.label); if (item.label === "プロジェクト") handleBack(); }}
                 style={{
                   display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 8, cursor: "pointer", marginBottom: 2,
                   background: activeNav === item.label ? "rgba(255,255,255,0.08)" : "transparent",
